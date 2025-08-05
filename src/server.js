@@ -1,5 +1,12 @@
 import express from "express";
 
+// ! importing routes
+import userRoutes from "./route/user.routes.js";
+import packageRoutes from "./route/package.routes.js";
+import bookingRoutes from "./route/booking.routes.js";
+import authRoutes from "./route/auth.routes.js";
+
+
 const PORT = 8080;
 
 // ! creating express app instance
@@ -13,44 +20,18 @@ app.get("/", (request, response) => {
   });
 });
 
-// *  crud user
-// * register user
-app.post("/auth/register", (request,response) => {
-  // * implement actual user register logic
-  response.status(201).json({
-    message: "User Register",
-    status: "success",
-  });
-});
+// !using routing
+app.use('/user',userRoutes)
+app.use('/package',packageRoutes)
+app.use('/booking',bookingRoutes)
+app.use('/auth',authRoutes)
 
 
-// *login
-app.post("/auth/login", (request,response) => {
-  // * implement actual user login logic
-  response.status(201).json({
-    message: " user login success",
-    status: "success",
-  });
-});
 
-// *update profile
-app.put('/user/:id',(request,response)=>{
-  response.status(200).json({
-    message : 'User profile update',
-    status:'success',
-  })
-})
-app.get('/user/:id',(request,response)=>{
-  response.status(200).json({
-    message : 'user by id fetched',
-    status:'success',
-  })
-})
-// !package 
-// post
-// get
-// get by id
-// 
+
+
+
+
 
 //*models
 // user model
