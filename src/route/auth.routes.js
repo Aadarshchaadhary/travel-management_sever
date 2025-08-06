@@ -1,26 +1,12 @@
+import express from "express";
+import { register, login } from "../controllers/auth.controllers.js";
 
-
-import express from 'express'
-
-const router = express.Router()
+const router = express.Router();
 
 // * register user
-router.post("/register", (request,response) => {
-  // * implement actual user register logic
-  response.status(201).json({
-    message: "User Register",
-    status: "success",
-  });
-});
-
+router.post("/register", register);
 
 // !login/ user
-router.post("/login", (request,response) => {
-  // * implement actual user login logic
-  response.status(201).json({
-    message: " user login success",
-    status: "success",
-  });
-});
+router.post("/login", login);
 
-export default express
+export default express;

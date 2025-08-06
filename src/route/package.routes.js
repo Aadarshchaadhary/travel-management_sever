@@ -1,41 +1,23 @@
 import express from "express";
+import {
+  create,
+  get,
+  getById,
+  remove,
+  update,
+} from "../controllers/package.controllers.js";
 
 const router = express.Router();
 
 // post
-router.post("/", (request, response) => {
-  response.status(201).json({
-    message: "package created",
-    status: "success",
-  });
-});
+router.post("/", create);
 // get
-router.get("/", (request, response) => {
-  response.status(200).json({
-    message: "package fetched sucessfully",
-    status: "sucsess",
-  });
-});
+router.get("/", get);
 // get by id
-router.get("/:id", (request, response) => {
-  response.status(200).json({
-    messgae: "package fetched",
-    status: "success",
-  });
-});
+router.get("/:id", getById);
 // delete
-router.delete("/:id", (request, response) => {
-  response.status(200).json({
-    messgae: "package deleted",
-    status: "success",
-  });
-});
+router.delete("/:id", remove);
 // update
-router.put("/:id", (request, response) => {
-  response.status(200).json({
-    message: "package updated",
-    status: "success",
-  });
-});
+router.put("/:id", update);
 
 export default express;

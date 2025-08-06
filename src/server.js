@@ -6,7 +6,6 @@ import packageRoutes from "./route/package.routes.js";
 import bookingRoutes from "./route/booking.routes.js";
 import authRoutes from "./route/auth.routes.js";
 
-
 const PORT = 8080;
 
 // ! creating express app instance
@@ -21,17 +20,10 @@ app.get("/", (request, response) => {
 });
 
 // !using routing
-app.use('/user',userRoutes)
-app.use('/package',packageRoutes)
-app.use('/booking',bookingRoutes)
-app.use('/auth',authRoutes)
-
-
-
-
-
-
-
+app.use("/user", userRoutes);
+app.use("/package", packageRoutes);
+app.use("/booking", bookingRoutes);
+app.use("/auth", authRoutes);
 
 //*models
 // user model

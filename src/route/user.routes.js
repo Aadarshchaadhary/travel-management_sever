@@ -1,34 +1,15 @@
 import express from "express";
+import { put, get, getALL, remove } from "../controllers/user.controllers.js";
 
 const router = express.Router();
 
 // *update profile
-router.put("/:id", (request, response) => {
-  response.status(200).json({
-    message: "User profile update",
-    status: "success",
-  });
-});
+router.put("/:id", put);
 //  get
-router.get("/:id", (request, response) => {
-  response.status(200).json({
-    message: "user by id fetched",
-    status: "success",
-  });
-});
+router.get("/:id", get);
 // ? get all users
-router.get("/", (request, response) => {
-  response.status(200).json({
-    message: " all user  fetched",
-    status: "success",
-  });
-});
+router.get("/", getALL);
 // delete
-router.delete("/:id", (resquest, response) => {
-  response.status(200).json({
-    message: " user deleted",
-    status: "successful",
-  });
-});
+router.delete("/:id", remove);
 
 export default router;

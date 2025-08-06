@@ -1,39 +1,25 @@
 import express from "express";
+import {
+  booking,
+  get,
+  getById,
+  remove,
+  update,
+} from "../controllers/package.controllers";
 
 const router = express.Router();
 
 // ! booking
-// get
-router.get("/", (request, response) => {
-  response.status(200).json({
-    messgae: "booking fethced",
-    status: "success",
-  });
-});
+
 // post
-router.post("/", (req, res) => {
-  res.status(201).json({
-    message: "bookings created",
-    status: "success",
-  });
-});
+router.post("/", booking);
+// get
+router.get("/", get);
 // get by id
-router.get("/:id", (req, res) => {
-  res.status(200).json({
-    messgae: "booking fetched",
-  });
-});
+router.get("/:id", getById);
 // delete
-router.delete("/:id", (req, res) => {
-  res.status(200).json({
-    message: "booking deleted",
-  });
-});
+router.delete("/:id", remove);
 //  update
-router.put("/:id", (req, res) => {
-  res.status(200).json({
-    message: "booking updated",
-  });
-});
+router.put("/:id", update);
 
 export default express;
