@@ -5,7 +5,7 @@ import {
   getById,
   remove,
   update,
-} from "../controllers/package.controllers";
+} from "../controllers/booking.controller.js";
 
 const router = express.Router();
 
@@ -22,4 +22,4 @@ router.delete("/:id", remove);
 //  update
 router.put("/:id", update);
 
-export default express;
+export default router;

@@ -1,5 +1,5 @@
 import express from "express";
-import { put, get, getALL, remove } from "../controllers/user.controllers.js";
+import { put, get, getALL, remove } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
@@ -12,4 +12,4 @@ router.get("/", getALL);
 // delete
 router.delete("/:id", remove);
 
-export default router;
+export default router; // !using routing
