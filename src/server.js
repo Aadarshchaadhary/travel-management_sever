@@ -6,8 +6,11 @@ import packageRoutes from "./route/package.routes.js";
 import bookingRoutes from "./route/booking.routes.js";
 import authRoutes from "./route/auth.routes.js";
 import { errorHandler } from "./middlewares/error-handler.middlewares.js";
+import { connect_db } from "./config/mongodb.config.js";
 
 const PORT = 8000;
+// ! connecting to database
+connect_db();
 
 // !middlewares
 // * is a function that runs on req , res cycle
@@ -58,7 +61,7 @@ const app = express();
 // app.use(middleware1);
 // app.use(middleware2);
 
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 
 // mid2 -> mid1 -> express.json() -> midn
 

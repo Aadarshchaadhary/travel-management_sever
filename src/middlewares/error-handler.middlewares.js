@@ -4,7 +4,7 @@ export const errorHandler = (error, req, res, next) => {
   const message = error.message || "something went wrong";
   res.status(statusCode).json({
     message,
-    error: error.error,
+    error: error.error ? error.error.tostring() : error,
     status: "error",
     statusCode,
   });
