@@ -1,16 +1,3 @@
-import mongoose from "mongoose";
-const packageing = [];
-export const users = [];
-const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-});
 // create
 export const create = (request, response) => {
   const data = request.body;

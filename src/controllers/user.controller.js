@@ -1,99 +1,108 @@
 import { request } from "express";
+import User from "../models/user.model.js";
 
 const users = [];
-// create
-export const put = (request, response) => {
-  const data = request.body;
-  console.log(data);
-
-  if (!data) {
-    response.status(400).json({
-      message: "..",
-      status: "..",
-    });
-    return;
-  }
-
-  users.push(data);
-  response.status(400).json({
-    message: "...",
-    status: "..",
-  });
-
-  response.status(200).json({
-    message: "User profile update",
-    status: "success",
-  });
-};
-
-// get
-export const get = (request, response) => {
-  const data = request.body;
-  console.log(data);
-
-  if (!data) {
-    response.status(400).json({
-      message: "....",
-      status: "",
-    });
-    return;
-  }
-  users.push(data);
-  response.status(400).json({
-    message: "...",
-    status: "",
-  });
-
-  response.status(200).json({
-    message: "user by id fetched",
-    status: "success",
-  });
-};
 // getall
-export const getALL = (request, response) => {
-  const data = request.body;
-  console.log(data);
+export const getALL = async (request, response, next) => {
+  try {
+    const users = await User.find({});
 
-  if (!data) {
-    response.status(400).json({
-      message: "..",
-      status: "error",
+    response.status(200).json({
+      message: " all user  fetched",
+      status: "success",
+      data: users,
     });
-    return;
+  } catch (error) {
+    next({
+      message: error.message || "something went wrong",
+      status: "error",
+      statusCode: 500,
+    });
   }
+};
 
-  users.push(data);
-  response.status(400).json({
-    message: "...",
-    status: "successfully",
-  });
+// getById
+export const getById = async (request, response, next) => {
+  try {
+    const { user_id } = request.params;
+    const user = await User.findOne({ _id: user_id });
+    if (!user) {
+      next({
+        message: "user not found",
+        status: "faild",
+        statusCode: 400,
+      });
+    }
 
-  console.log("hello");
-  response.status(200).json({
-    message: " all user  fetched",
-    status: "success",
-  });
+    response.status(200).json({
+      message: "user by id fetched",
+      status: "success",
+      data: user,
+    });
+  } catch (error) {
+    next({
+      message: error.message || "something went wrong",
+      status: "error",
+      statusCode: 400,
+    });
+  }
 };
 // delete
-export const remove = (resquest, response) => {
-  const data = request.body;
-  console.log(data);
+export const remove = async (request, response, next) => {
+  try {
+    const { user_id } = request.params;
+    const user = await User.findByIdAndDelete(user_id);
 
-  if (!data) {
-    response.status(400).json({
-      message: "..",
-      status: "error",
+    if (!user) {
+      next({
+        message: "user not found",
+        status: "faild",
+        statusCode: 400,
+      });
+    }
+
+    response.status(200).json({
+      message: " user deleted",
+      status: "successful",
+      data: user,
     });
-    return;
+  } catch (error) {
+    next({
+      message: error.message || "something went wrong",
+      status: "error",
+      statusCode: 400,
+    });
   }
+};
 
-  users.push(data);
-  response.status(400).json({
-    message: "...",
-    status: "successfully",
-  });
-  response.status(200).json({
-    message: " user deleted",
-    status: "successful",
-  });
+// update
+export const put = async (request, response, next) => {
+  try {
+    const { user_id } = request.params;
+    const { first_name, last_name, gender, phone } = request.body;
+
+    const user = await User.findByIdAndUpdate(
+      user_id,
+      { first_name, last_name, gender, phone },
+      { new: true, revalidate: true }
+    );
+    if (!user) {
+      next({
+        message: "User not found",
+        status: "faild",
+        statusCode: 404,
+      });
+    }
+
+    response.status(200).json({
+      message: "User profile update",
+      status: "success",
+    });
+  } catch (error) {
+    next({
+      message: error.message || "something went wrong",
+      status: "error",
+      statusCode: 400,
+    });
+  }
 };
