@@ -1,5 +1,6 @@
 import { request } from "express";
 import User from "../models/user.model.js";
+import AppError from "../middlewares/error-handler.middlewares.js";
 
 const users = [];
 // getall
@@ -13,11 +14,7 @@ export const getALL = async (request, response, next) => {
       data: users,
     });
   } catch (error) {
-    next({
-      message: error.message || "something went wrong",
-      status: "error",
-      statusCode: 500,
-    });
+    next(Error);
   }
 };
 
@@ -27,11 +24,7 @@ export const getById = async (request, response, next) => {
     const { user_id } = request.params;
     const user = await User.findOne({ _id: user_id });
     if (!user) {
-      next({
-        message: "user not found",
-        status: "faild",
-        statusCode: 400,
-      });
+      throw AppError("user not found", 404);
     }
 
     response.status(200).json({
@@ -40,11 +33,7 @@ export const getById = async (request, response, next) => {
       data: user,
     });
   } catch (error) {
-    next({
-      message: error.message || "something went wrong",
-      status: "error",
-      statusCode: 400,
-    });
+    next(error);
   }
 };
 // delete
@@ -54,11 +43,7 @@ export const remove = async (request, response, next) => {
     const user = await User.findByIdAndDelete(user_id);
 
     if (!user) {
-      next({
-        message: "user not found",
-        status: "faild",
-        statusCode: 400,
-      });
+      throw AppError("user not found", 404);
     }
 
     response.status(200).json({
@@ -67,11 +52,7 @@ export const remove = async (request, response, next) => {
       data: user,
     });
   } catch (error) {
-    next({
-      message: error.message || "something went wrong",
-      status: "error",
-      statusCode: 400,
-    });
+    next(error);
   }
 };
 
@@ -87,11 +68,7 @@ export const put = async (request, response, next) => {
       { new: true, revalidate: true }
     );
     if (!user) {
-      next({
-        message: "User not found",
-        status: "faild",
-        statusCode: 404,
-      });
+      throw AppError("user not found", 404);
     }
 
     response.status(200).json({
@@ -99,10 +76,6 @@ export const put = async (request, response, next) => {
       status: "success",
     });
   } catch (error) {
-    next({
-      message: error.message || "something went wrong",
-      status: "error",
-      statusCode: 400,
-    });
+    next(error);
   }
 };
