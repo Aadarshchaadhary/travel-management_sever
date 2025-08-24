@@ -51,11 +51,7 @@ export const login = async (request, response, next) => {
     const users = await User.findOn({ email });
 
     if (!users) {
-      next({
-        message: "email or password does not  match",
-        status: "error",
-      });
-      return;
+      throw new AppError("email or password does not  match", 400);
     }
 
     // const ispassmatch = users.password === data.password;
