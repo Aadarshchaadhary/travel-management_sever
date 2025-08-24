@@ -12,6 +12,6 @@ export const connect_db = () => {
     })
     .catch((error) => {
       console.log("database---- connection------- error------");
-      console.log("error");
+      console.log(error);
     });
 };

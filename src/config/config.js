@@ -1,4 +1,4 @@
 export const mongodb_config = {
-  url: "mongodb://localhost:27017",
-  db_name: "travel-management",
+  url: process.env.DB_URL,
+  db_name: process.env.DB_NAME,
 };

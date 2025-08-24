@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 
 // ! importing routes
@@ -5,7 +6,9 @@ import userRoutes from "./route/auth.routes.js";
 import packageRoutes from "./route/package.routes.js";
 import bookingRoutes from "./route/booking.routes.js";
 import authRoutes from "./route/auth.routes.js";
-import { errorHandler } from "./middlewares/error-handler.middlewares.js";
+import AppError, {
+  errorHandler,
+} from "./middlewares/error-handler.middlewares.js";
 import { connect_db } from "./config/mongodb.config.js";
 
 const PORT = 8000;
@@ -83,13 +86,8 @@ app.use("/booking", bookingRoutes);
 app.use((req, res, next) => {
   const message = `can not ${req.method} on ${req.originalUrl}`;
 
-  const error = new Error(message);
-  next({
-    message,
-    error,
-    statusCode: 404,
-    status: "error",
-  });
+  const error = new AppError(message, 404);
+  next(error);
 });
 
 //*models
