@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs";
 // *hash user password
 export const hash_password = async (password) => {
   try {
-    const salt = await bcrypt.gensalt(10);
+    const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
   } catch (error) {
+    console.log(error);
     throw new AppError("password hashing error", 500);
   }
 };

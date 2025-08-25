@@ -64,7 +64,7 @@ const app = express();
 // app.use(middleware1);
 // app.use(middleware2);
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 // mid2 -> mid1 -> express.json() -> midn
 

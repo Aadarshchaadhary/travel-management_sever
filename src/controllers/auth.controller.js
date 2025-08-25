@@ -9,8 +9,11 @@ import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
 export const register = async (request, response, next) => {
   // * implement actual user register logic
   try {
+    console.log(request.body);
     const { first_name, last_name, email, password, Phone, gender } =
       request.body;
+    const file = request.file;
+    console.log(file);
     // console.log(request.body);
     if (!password) {
       throw new AppError("PASSWORD  IS REQUIRED", 400);
@@ -18,7 +21,7 @@ export const register = async (request, response, next) => {
     const hashed = await hash_password(password);
 
     // insert user data to database user collection
-    const user = await User.create({
+    const user = new User({
       first_name,
       last_name,
       email,
@@ -26,6 +29,15 @@ export const register = async (request, response, next) => {
       Phone,
       gender,
     });
+
+    if (file) {
+      user.profile_image = {
+        path: file.path,
+        public_id: file.filename,
+      };
+    }
+
+    await user.save();
 
     response.status(201).json({
       message: "Account created",

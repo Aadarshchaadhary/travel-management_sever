@@ -25,6 +25,14 @@ const userSchema = mongoose.Schema(
     phone: {
       type: String,
     },
+    profile_image: {
+      path: {
+        type: String,
+      },
+      public_id: {
+        type: String,
+      },
+    },
     role: {
       type: String,
       enum: Object.values(Role),
