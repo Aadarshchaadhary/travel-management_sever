@@ -6,6 +6,7 @@ import AppError from "../middlewares/error-handler.middlewares.js";
 import User from "../models/user.model.js";
 import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
 import { upload_file } from "../utils/cloudinary.utils.js";
+import { generate_token } from "../utils/jwt.utils.js";
 
 export const register = async (request, response, next) => {
   // * implement actual user register logic
@@ -62,7 +63,7 @@ export const login = async (request, response, next) => {
       throw new AppError("email is eequired", 400);
     }
 
-    const usersç = await User.findOn({ email });
+    const users = await User.findOn({ email });
 
     if (!User) {
       throw new AppError("email or password does not  match", 400);
@@ -78,10 +79,22 @@ export const login = async (request, response, next) => {
       });
       return;
     }
+    // *generate jwt token
+    const access_token = generate_token({
+      first_name: User.first_name,
+      last_name: User.last_name,
+      _id: User._id,
+      email: User.email,
+      role: User.role,
+    });
 
     response.status(201).json({
       message: " user login success",
       status: "success",
+      data: {
+        User,
+        access_token,
+      },
     });
   } catch (error) {
     next({
