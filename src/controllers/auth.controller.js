@@ -63,14 +63,14 @@ export const login = async (request, response, next) => {
       throw new AppError("email is eequired", 400);
     }
 
-    const users = await User.findOn({ email });
+    const user = await User.findOne({ email }).select("+password");
 
-    if (!User) {
+    if (!user) {
       throw new AppError("email or password does not  match", 400);
     }
 
     // const ispassmatch = users.password === data.password;
-    const ispassmatch = compare_password(password, User.password);
+    const ispassmatch = compare_password(password, user.password);
 
     if (!ispassmatch) {
       next({
@@ -81,18 +81,18 @@ export const login = async (request, response, next) => {
     }
     // *generate jwt token
     const access_token = generate_token({
-      first_name: User.first_name,
-      last_name: User.last_name,
-      _id: User._id,
-      email: User.email,
-      role: User.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      _id: user._id,
+      email: user.email,
+      role: user.role,
     });
 
     response.status(201).json({
       message: " user login success",
       status: "success",
       data: {
-        User,
+        user,
         access_token,
       },
     });
