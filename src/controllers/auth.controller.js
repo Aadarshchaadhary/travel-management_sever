@@ -5,6 +5,7 @@
 import AppError from "../middlewares/error-handler.middlewares.js";
 import User from "../models/user.model.js";
 import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
+import { upload_file } from "../utils/cloudinary.utils.js";
 
 export const register = async (request, response, next) => {
   // * implement actual user register logic
@@ -31,9 +32,10 @@ export const register = async (request, response, next) => {
     });
 
     if (file) {
+      const { path, public_id } = await upload_file(file.path, "/avatar");
       user.profile_image = {
-        path: file.path,
-        public_id: file.filename,
+        path: path,
+        public_id: public_id,
       };
     }
 
@@ -60,14 +62,14 @@ export const login = async (request, response, next) => {
       throw new AppError("email is eequired", 400);
     }
 
-    const users = await User.findOn({ email });
+    const usersç = await User.findOn({ email });
 
-    if (!users) {
+    if (!User) {
       throw new AppError("email or password does not  match", 400);
     }
 
     // const ispassmatch = users.password === data.password;
-    const ispassmatch = compare_password();
+    const ispassmatch = compare_password(password, User.password);
 
     if (!ispassmatch) {
       next({

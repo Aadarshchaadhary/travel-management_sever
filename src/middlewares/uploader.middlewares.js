@@ -1,9 +1,20 @@
 import multer from "multer";
 import fs from "fs";
+import path from "path";
 
 export const uploader = (destination = "/") => {
   const uploade_folder = "uploads" + destination;
   const size_limit = 5 * 1024 * 1024; // 5mb
+
+  const allowed_extentions = [
+    "png",
+    "jpg",
+    "jpeg",
+    "webb",
+    "svg",
+    "gif",
+    "aviff",
+  ];
   const storage = multer.diskStorage({
     destination: (req, res, cb) => {
       if (!fs.existsSync(uploade_folder)) {
@@ -17,6 +28,26 @@ export const uploader = (destination = "/") => {
       // cb(null, file.originalname);
     },
   });
-  const upload = multer({ storage: storage, limits: { fileSize: size_limit } });
+  // *FILEFILLTER
+  const fileFilter = (req, file, cb) => {
+    const ext_name = path.extname(file.originalname).replace(".", "");
+
+    if (!allowed_extentions.includes(ext_name)) {
+      const error = new AppError(
+        `${ext_name}, 🌈is not allowed.only ${allowed_extentions.join(
+          ","
+        )} format is supported.`,
+        400
+      );
+      cb(error);
+    }
+    cb(null, true);
+  };
+
+  const upload = multer({
+    storage: storage,
+    fileFilter,
+    limits: { fileSize: size_limit },
+  });
   return upload;
 };

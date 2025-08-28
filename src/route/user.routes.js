@@ -1,10 +1,12 @@
 import express from "express";
-import { put, get, getALL, remove } from "../controllers/user.controller.js";
+import { get, getALL, remove, update } from "../controllers/user.controller.js";
+import { uploader } from "../middlewares/uploader.middlewares.js";
 
 const router = express.Router();
+const upload = uploader();
 
 // *update profile
-router.put("/:id", put);
+router.put("/:id", upload.single("profile_image"), update);
 //  get
 router.get("/:id", get);
 // ? get all users

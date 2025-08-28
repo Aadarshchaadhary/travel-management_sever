@@ -66,6 +66,9 @@ const app = express();
 
 app.use(express.json({ limit: "10mb" }));
 
+// * serving uploads as static file
+app.use("/uploads", express.static("uploads/"));
+
 // mid2 -> mid1 -> express.json() -> midn
 
 // *ping route
