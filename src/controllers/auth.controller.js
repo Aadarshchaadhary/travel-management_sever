@@ -88,14 +88,22 @@ export const login = async (request, response, next) => {
       role: user.role,
     });
 
-    response.status(201).json({
-      message: " user login success",
-      status: "success",
-      data: {
-        user,
-        access_token,
-      },
-    });
+    response
+      .cookie("access_tooken", access_token, {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        secure: false,
+      })
+      .status(201)
+      .json({
+        message: " user login success",
+        status: "success",
+        data: {
+          user,
+          access_token,
+        },
+      });
   } catch (error) {
     next({
       message: error?.message || "something went wrong",
