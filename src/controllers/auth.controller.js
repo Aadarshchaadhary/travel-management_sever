@@ -2,11 +2,13 @@
 // params
 // query
 // body
+import { send } from "process";
 import AppError from "../middlewares/error-handler.middlewares.js";
 import User from "../models/user.model.js";
 import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
 import { upload_file } from "../utils/cloudinary.utils.js";
 import { generate_token } from "../utils/jwt.utils.js";
+import { send_email } from "../utils/nodemailer.utils.js";
 
 export const register = async (request, response, next) => {
   // * implement actual user register logic
@@ -87,13 +89,15 @@ export const login = async (request, response, next) => {
       email: user.email,
       role: user.role,
     });
+    await send_email();
 
     response
       .cookie("access_tooken", access_token, {
         httpOnly: true,
         sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        secure: false,
+        maxAge:
+          parseInt(process.env.COOKIE_EXPRESS_IN || 7) * 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === "development" ? true : false,
       })
       .status(201)
       .json({

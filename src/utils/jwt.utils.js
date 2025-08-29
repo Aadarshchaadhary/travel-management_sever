@@ -1,15 +1,13 @@
+import { jwt_config } from "../config/config.js";
 import AppError from "../middlewares/error-handler.middlewares.js";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = "jjjjjjjjkkkkkk";
-const JWT_EXPIRES_IN = "7d";
 
 //  generate token
 // @payload name ,email,id,role
 export const generate_token = (payload) => {
   try {
-    return jwt.sign(payload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
+    return jwt.sign(payload, jwt_config.secret, {
+      expiresIn: jwt_config.expires_in,
     });
   } catch (error) {
     console.log(error);
@@ -20,7 +18,7 @@ export const generate_token = (payload) => {
 // verify token
 export const verify_token = (token) => {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, jwt_config.secret);
   } catch (error) {
     console.log(error);
     throw new AppError("User verification error", 401);
