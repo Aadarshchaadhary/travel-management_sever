@@ -89,7 +89,6 @@ export const login = async (request, response, next) => {
       email: user.email,
       role: user.role,
     });
-    await send_email();
 
     response
       .cookie("access_tooken", access_token, {

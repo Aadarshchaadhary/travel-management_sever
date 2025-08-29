@@ -1,29 +1,48 @@
 import nodemailer from "nodemailer";
 import AppError from "../middlewares/error-handler.middlewares.js";
-//  transporter
+import { smtp_config } from "../config/config.js";
+
+// * transporter
 const transporter = nodemailer.createTransport({
-  host: "stmp.gmail.com",
-  port: 465,
-  secure: true,
-  service: "gmail",
+  host: smtp_config.host,
+  port: parseInt(smtp_config.port),
+  secure: parseInt(smtp_config.port) === 465 ? true : false,
+  service: smtp_config.user,
   auth: {
-    user: "adarshry869@gmail.com",
-    pass: "ispq jano hphb mzjs",
+    user: smtp_config.user,
+    pass: smtp_config.pass,
   },
 });
 
 // * send email
-export const send_email = async () => {
+export const send_email = async (
+  to,
+  subject,
+  html,
+  cc = null,
+  bcc = null,
+  attachments = null
+) => {
   try {
-    await transporter.sendMail({
+    const message_options = {
       from: `"Travel management"<adarshry869@gmail.com>`,
-      to: "chaudharyaadarsh003@gmail.com",
-      subject: "testing Email",
-      html: `<body>style:'background-color:Blue',
-            <h1 style='color:red'>Email testing sucess🙀👍🏻 </h1>
-            </body>
-            `,
-    });
+      to,
+      subject,
+      html,
+    };
+    if (cc) {
+      message_options["cc"] = cc;
+    }
+
+    if (bcc) {
+      message_options["bcc"] = bcc;
+    }
+
+    if (attachments) {
+      message_options["attachments"] = attachments;
+    }
+
+    await transporter.sendMail(message_options);
   } catch (error) {
     console.log(error);
     throw new AppError("Email sending error", 500);
