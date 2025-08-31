@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const packageing = [];
 export const users = [];
-const packageingSchema = mongoose.Schema({
+const packageingSchema = new mongoose.Schema({
   package_name: {
     type: String,
     required: true,
