@@ -81,7 +81,7 @@ export const update = async (request, response, next) => {
         await delete_file(user.profile_image.public_id);
       }
       // * upload new file
-      const {} = await upload_file(file, path);
+      const { path, public_id } = await upload_file(file.path);
 
       // * update new profile_image
       user.profile_image = {
@@ -89,6 +89,7 @@ export const update = async (request, response, next) => {
         public_id,
       };
     }
+    await user.save();
 
     response.status(200).json({
       message: "User profile update",
