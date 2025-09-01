@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 
 // ! importing routes
+import categoryRoutes from "./route/category.routes.js";
 import userRoutes from "./route/auth.routes.js";
 import packageRoutes from "./route/package.routes.js";
 import bookingRoutes from "./route/booking.routes.js";
@@ -79,7 +80,7 @@ app.get("/", (request, response) => {
 });
 
 // !using routing
-
+app.use("/category", categoryRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/package", packageRoutes);

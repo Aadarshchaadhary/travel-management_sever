@@ -1,6 +1,6 @@
-import AppError from "../middlewares/error-handler.middlewares";
-import Category from "../models/category.model";
-import { delete_file, upload_file } from "../utils/cloudinary.utils";
+import AppError from "../middlewares/error-handler.middlewares.js";
+import Category from "../models/category.model.js";
+import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
 
 const category_folder = "/categories";
 // * create new category
@@ -22,6 +22,12 @@ export const create = async (req, res, next) => {
         public_id,
       };
     }
+    await category.save();
+    res.status(201).json({
+      message: "category created",
+      status: "success",
+      data: category,
+    });
   } catch (error) {
     next(error);
   }
@@ -63,12 +69,14 @@ export const getById = async (req, res, next) => {
 // * upadate category
 export const upadate = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { id } = req.params;
+    console.log(id);
     const file = req.file;
     const { name, description } = req.body;
     const category = await Category.findById(id);
     if (!category) {
-      throw AppError("category not found", 404);
+      throw new AppError("category not found", 404);
     }
     if (name) {
       category.name = name;
