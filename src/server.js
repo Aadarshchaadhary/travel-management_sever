@@ -11,6 +11,7 @@ import AppError, {
   errorHandler,
 } from "./middlewares/error-handler.middlewares.js";
 import { connect_db } from "./config/mongodb.config.js";
+import cookieParser from "cookie-parser";
 
 const PORT = 8000;
 // ! connecting to database
@@ -64,7 +65,7 @@ const app = express();
 // * using middleware
 // app.use(middleware1);
 // app.use(middleware2);
-
+app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 
 // * serving uploads as static file
@@ -80,6 +81,7 @@ app.get("/", (request, response) => {
 });
 
 // !using routing
+
 app.use("/category", categoryRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
