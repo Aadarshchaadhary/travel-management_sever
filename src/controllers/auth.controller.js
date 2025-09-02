@@ -91,12 +91,12 @@ export const login = async (request, response, next) => {
     });
 
     response
-      .cookie("access_tooken", access_token, {
+      .cookie("access_token", access_token, {
         httpOnly: true,
         sameSite: "none",
         maxAge:
           parseInt(process.env.COOKIE_EXPRESS_IN || 7) * 24 * 60 * 60 * 1000,
-        secure: process.env.NODE_ENV === "development" ? true : false,
+        secure: process.env.NODE_ENV === "development" ? false : true,
       })
       .status(201)
       .json({
