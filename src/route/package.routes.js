@@ -5,7 +5,7 @@ import {
   getById,
   remove,
   update,
-} from "../controllers/package.controller.js";
+} from "../controllers/packageing.controller.js";
 
 const router = express.Router();
 

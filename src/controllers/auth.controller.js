@@ -2,13 +2,12 @@
 // params
 // query
 // body
-import { send } from "process";
+
 import AppError from "../middlewares/error-handler.middlewares.js";
 import User from "../models/user.model.js";
 import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
 import { upload_file } from "../utils/cloudinary.utils.js";
 import { generate_token } from "../utils/jwt.utils.js";
-import { send_email } from "../utils/nodemailer.utils.js";
 
 export const register = async (request, response, next) => {
   // * implement actual user register logic

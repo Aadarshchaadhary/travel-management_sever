@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { package_cost_type } from "../config/constants.js";
 
 const package_schema = new mongoose.Schema(
   {
@@ -15,6 +16,26 @@ const package_schema = new mongoose.Schema(
       required: [true, "category  is required"],
       ref: "category",
     },
+    //  cover_image
+    cover_image: {
+      type: {
+        paths: String,
+        public_id: String,
+      },
+      required: [true, "Vover images is required"],
+    },
+
+    // images
+    images: [
+      {
+        type: {
+          path: String,
+          public_id: String,
+        },
+        required: [true, "Images is reqired"],
+        minlenght: [2, "Atleast tow images reqired"],
+      },
+    ],
 
     description: {
       type: String,
@@ -56,8 +77,8 @@ const package_schema = new mongoose.Schema(
     ],
     cost_type: {
       type: String,
-      enum: ["PER_PERSON", PER_DAY],
-      default: "PER_PERSON",
+      enum: Object.values(package_cost_type),
+      default: package_cost_type.PER_PERSON,
     },
   },
   { timestamps: true }
