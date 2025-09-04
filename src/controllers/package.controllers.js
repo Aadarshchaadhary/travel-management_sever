@@ -1,12 +1,12 @@
 import Tour_package from "../models/package.model.js";
 import Category from "../models/package.model.js";
 import AppError from "../middlewares/error-handler.middlewares.js";
-import { upload_file } from "../utils/cloudinary.utils.js";
+import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
 
 const package_folder = "/package";
 
 // create
-export const create = async (request, response, next) => {
+export const create = async (req, res, next) => {
   try {
     const {
       name,
@@ -19,7 +19,7 @@ export const create = async (request, response, next) => {
       destination,
       cost_type,
     } = request.body;
-    const { cover_image, images } = request.files;
+    const { cover_image, images } = req.files;
     if (!cover_image) {
       throw new AppError("Cover image is required", 400);
     }
@@ -69,7 +69,7 @@ export const create = async (request, response, next) => {
 
     await tour_package.save();
 
-    response.status(201).json({
+    res.status(201).json({
       message: "package created",
       status: "success",
     });
@@ -78,10 +78,10 @@ export const create = async (request, response, next) => {
   }
 };
 // get
-export const get = async (request, response, next) => {
+export const get = async (req, res, next) => {
   try {
     const tour_package = await Tour_packageour_package.find({});
-    response.status(201).json({
+    res.status(201).json({
       message: " package fetched successfully",
       status: successfully,
       data: tour_package,
@@ -90,21 +90,21 @@ export const get = async (request, response, next) => {
     next(error);
   }
 
-  response.status(200).json({
+  res.status(200).json({
     message: "package fetched sucessfully",
     status: "sucsess",
   });
 };
 //  GetById
-export const getById = async (request, response, next) => {
-  const { id } = request.params;
+export const getById = async (req, res, next) => {
+  const { id } = req.params;
 
   try {
     const tour_package = await Tour_package.findById(id);
     if (!tour_package) {
       throw new AppError("package not founded", 404);
     }
-    response.status(201).json({
+    res.status(201).json({
       message: " package fetched successfully",
       status: successfully,
       data: tour_package,
@@ -112,43 +112,61 @@ export const getById = async (request, response, next) => {
   } catch (error) {
     next(error);
   }
-  response.status(200).json({
+  res.status(200).json({
     messgae: "package fetched",
     status: "success",
   });
 };
 // delete
-export const remove = async (request, response) => {
-  response.status(200).json({
-    messgae: "package deleted",
-    status: "success",
-  });
-};
-// update
-export const update = (request, response) => {
-  const data = request.body;
-  console, log(data);
+export const remove = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-  // delete cover image
-  // delete images
-  // delete package
-  // ? await tour_package.deleteOne()
+    // find package
+    const pkg = await Package.findById(id);
+    if (!pkg) {
+      throw new AppError("Package not found", 404);
+    }
 
-  if (!data) {
-    response.status(400).json({
-      message: "..",
-      status: "error",
+    // delete cover image
+    if (pkg.cover_image) {
+      await delete_file(pkg.cover_image);
+    }
+
+    // delete  images
+    if (pkg.images) {
+      await delete_file(pkg.images);
+    }
+
+    // delete package
+    await pkg.deleteOne();
+
+    await pkg.save();
+
+    res.status(200).json({
+      message: "Package deleted successfully",
+      status: "success",
     });
-    return;
+  } catch (error) {
+    next(error);
   }
-  packageing.push(data);
-  response.status(400).json({
-    message: "..",
-    status: "success",
-  });
+};
 
-  response.status(200).json({
-    message: "package updated",
-    status: "success",
-  });
+// update
+export const update = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const pkg = await Package.FindById(id);
+    if (!pkg) {
+      throw new AppError("package not founded", 404);
+    }
+    await pkg.save();
+
+    res.status(200).json({
+      message: "package updated",
+      status: "success",
+    });
+  } catch (error) {
+    next(error);
+  }
 };

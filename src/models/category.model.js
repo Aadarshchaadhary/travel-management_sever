@@ -25,7 +25,7 @@ const category_schema = new mongoose.Schema(
       required: [true, "logo is required"],
     },
   },
-  { TimeStamps: true }
+  { timestamps: true }
 );
 
 //  create model

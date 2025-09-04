@@ -1,6 +1,7 @@
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import AppError from "./error-handler.middlewares.js";
 
 export const uploader = (destination = "/") => {
   const uploade_folder = "uploads" + destination;
@@ -13,7 +14,7 @@ export const uploader = (destination = "/") => {
     "webb",
     "svg",
     "gif",
-    "aviff",
+    "avif",
   ];
   const storage = multer.diskStorage({
     destination: (req, res, cb) => {

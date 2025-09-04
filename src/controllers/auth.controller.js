@@ -65,6 +65,7 @@ export const login = async (request, response, next) => {
     }
 
     const user = await User.findOne({ email }).select("+password");
+    console.log(user);
 
     if (!user) {
       throw new AppError("email or password does not  match", 400);
