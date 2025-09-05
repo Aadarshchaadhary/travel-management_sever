@@ -62,7 +62,7 @@ const package_schema = new mongoose.Schema(
       min: [0, "total seats must be greater than 0"],
     },
 
-    seat_available: {
+    seats_available: {
       type: Number,
       required: [true, "Available seat is required"],
       min: [0, "total seats must be greater than 0"],
@@ -71,7 +71,7 @@ const package_schema = new mongoose.Schema(
       {
         type: {
           location: String,
-          time: Number,
+          time: String,
         },
       },
     ],

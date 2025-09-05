@@ -1,5 +1,5 @@
 import Tour_package from "../models/package.model.js";
-import Category from "../models/package.model.js";
+import Category from "../models/category.model.js";
 import AppError from "../middlewares/error-handler.middlewares.js";
 import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
 
@@ -18,7 +18,7 @@ export const create = async (req, res, next) => {
       price,
       destination,
       cost_type,
-    } = request.body;
+    } = req.body;
     const { cover_image, images } = req.files;
     if (!cover_image) {
       throw new AppError("Cover image is required", 400);
@@ -29,17 +29,17 @@ export const create = async (req, res, next) => {
     const tour_package = new Tour_package({
       name,
       description,
-      start_date,
-      end_date,
+      start_date: new Date(start_date),
+      end_date: new Date(end_date),
       total_seats,
-      seat_availabe: parseInt(total_seats),
+      seats_available: parseInt(total_seats),
       price,
       destination,
       cost_type,
       destination: JSON.parse(destination ?? ""),
     });
 
-    const package_category = await Category.FindById(category);
+    const package_category = await Category.findById(category);
 
     if (!package_category) {
       throw new AppError("category is not founded", 404);
@@ -47,7 +47,10 @@ export const create = async (req, res, next) => {
     tour_package.category = package_category._id;
 
     // upload cover_image
-    const { path, public_id } = await upload_file(cover_image.path, "/package");
+    const { path, public_id } = await upload_file(
+      cover_image[0].path,
+      "/package"
+    );
 
     tour_package.cover_image = {
       path,
@@ -80,10 +83,10 @@ export const create = async (req, res, next) => {
 // get
 export const get = async (req, res, next) => {
   try {
-    const tour_package = await Tour_packageour_package.find({});
+    const tour_package = await Tour_package.find({});
     res.status(201).json({
       message: " package fetched successfully",
-      status: successfully,
+      status: "successfully",
       data: tour_package,
     });
   } catch (error) {
@@ -106,7 +109,7 @@ export const getById = async (req, res, next) => {
     }
     res.status(201).json({
       message: " package fetched successfully",
-      status: successfully,
+      status: "successfully",
       data: tour_package,
     });
   } catch (error) {
@@ -159,6 +162,9 @@ export const update = async (req, res, next) => {
     const pkg = await Package.FindById(id);
     if (!pkg) {
       throw new AppError("package not founded", 404);
+    }
+    if (image) {
+      await create_image();
     }
     await pkg.save();
 
