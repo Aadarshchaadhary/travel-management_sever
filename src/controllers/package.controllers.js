@@ -133,18 +133,18 @@ export const remove = async (req, res, next) => {
 
     // delete cover image
     if (pkg.cover_image) {
-      await delete_file(pkg.cover_image);
+      await delete_file(pkg.cover_image.public_id);
     }
 
     // delete  images
     if (pkg.images) {
-      await delete_file(pkg.images);
+      await Promise.all(
+        pkg.image.map(async (image) => delete_file(image.public_id))
+      );
     }
 
     // delete package
     await pkg.deleteOne();
-
-    await pkg.save();
 
     res.status(200).json({
       message: "Package deleted successfully",
