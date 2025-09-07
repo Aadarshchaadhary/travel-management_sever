@@ -126,25 +126,25 @@ export const remove = async (req, res, next) => {
     const { id } = req.params;
 
     // find package
-    const pkg = await Package.findById(id);
-    if (!pkg) {
+    const tour_package = await Tour_package.findById(id);
+    if (!tour_package) {
       throw new AppError("Package not found", 404);
     }
 
     // delete cover image
-    if (pkg.cover_image) {
+    if (tour_package.cover_image) {
       await delete_file(pkg.cover_image.public_id);
     }
 
     // delete  images
-    if (pkg.images) {
+    if (tour_package.images) {
       await Promise.all(
-        pkg.image.map(async (image) => delete_file(image.public_id))
+        tour_package.images.map(async (image) => delete_file(image.public_id))
       );
     }
 
     // delete package
-    await pkg.deleteOne();
+    await tour_package.deleteOne();
 
     res.status(200).json({
       message: "Package deleted successfully",
@@ -159,13 +159,45 @@ export const remove = async (req, res, next) => {
 export const update = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const pkg = await Package.FindById(id);
-    if (!pkg) {
+    const {
+      name,
+      category,
+      description,
+      start_date,
+      end_date,
+      total_seats,
+      price,
+      destination,
+      cost_type,
+    } = req.body;
+
+    const tour_package = await Tour_package.FindById(id);
+    if (!tour_package) {
       throw new AppError("package not founded", 404);
     }
-    if (image) {
-      await create_image();
+    if (name) tour_package.name = name;
+    if (description) tour_package.description = description;
+    if (total_seats) tour_package.total_seats = total_seats;
+    if (start_date) tour_package.total_seats = new Date(start_date);
+    if (end_date) tour_package.end_date = new Date(end_date);
+    if (cost_type) tour_package.cost_type = cost_type;
+    if (price) tour_package.price = price;
+    if (destination) tour_package.destination = JSON.parse(destination);
+
+    const { cover_image, images } = req.files;
+    // delete cover image
+    if (cover_image) {
+      await delete_file(pkg.cover_image.public_id);
+      const { path, public_id } = await upload_file(
+        cover_image[0].path,
+        package_folder
+      );
+      tour_package.cover_image = {
+        path,
+        public_id,
+      };
     }
+
     await pkg.save();
 
     res.status(200).json({
