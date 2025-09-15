@@ -1,33 +1,30 @@
 import mongoose from "mongoose";
 
-export const Booking = [];
-const bookingSchema = mongoose.Schema({
-  customer_name: {
-    type: String,
-    required: true,
-  },
+const booking_model = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: [true, "user is required"],
+    },
+    tour_package: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "tour_package",
+      required: [true, "package is required"],
+    },
+    total_price: {
+      type: Number,
+      min: [0, "Price must be positive"],
+      required: [true, "price is required"],
+    },
 
-  phone_number: {
-    type: Number,
-    required: true,
+    total_person: {
+      type: Number,
+      default: 1,
+      required: [true, "Number of persons are required"],
+    },
   },
-
-  product_details: {
-    type: String,
-    required: trusted,
-  },
-
-  price: {
-    type: Number,
-    required: true,
-  },
-
-  payemnt_details: {
-    type: Number,
-    required: true,
-  },
-});
-//  creating database collection(model)/ mongoose model
-const Booking = mongoose.model("book", bookingSchema);
-
+  { timestamps: true }
+);
+const Booking = mongoose.model("booking", booking_model);
 export default Booking;

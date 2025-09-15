@@ -80,9 +80,28 @@ export const create = async (req, res, next) => {
     next(error);
   }
 };
-// get
+// get all
 export const get = async (req, res, next) => {
   try {
+    let fillter = {};
+    const { query } = req.query;
+    if (query) {
+      fillter.$or = [
+        {
+          name: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          des: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+      ];
+    }
+
     const tour_package = await Tour_package.find({});
     res.status(201).json({
       message: " package fetched successfully",
