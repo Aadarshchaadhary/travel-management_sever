@@ -2,6 +2,8 @@ import Tour_package from "../models/package.model.js";
 import Category from "../models/category.model.js";
 import AppError from "../middlewares/error-handler.middlewares.js";
 import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
+import { startSession } from "mongoose";
+import { getPegination } from "../utils/pagination.utils.js";
 
 const package_folder = "/package";
 
@@ -83,10 +85,23 @@ export const create = async (req, res, next) => {
 // get all
 export const get = async (req, res, next) => {
   try {
-    let fillter = {};
-    const { query } = req.query;
+    let filter = {};
+    const {
+      query,
+      type,
+      min_price,
+      max_price,
+      start_date,
+      end_date,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    const current_page = Number(page);
+    const query_limit = Number(limit);
+    const skip = (current_page - 1) * query_limit;
+
     if (query) {
-      fillter.$or = [
+      filter.$or = [
         {
           name: {
             $regex: query,
@@ -101,12 +116,31 @@ export const get = async (req, res, next) => {
         },
       ];
     }
+    if (type) {
+      filter.cost_type = type;
+    }
+    if (min_price || max_price) {
+      if (min_price) filter.price.$gte = min_price; //gte = greater than equal
 
-    const tour_package = await Tour_package.find({});
+      if (max_price) filter.price.$lte = max_price; // lte = less than equal
+    }
+
+    if (start_date) filter.start_date.$gte = new Date(start_date);
+    if (end_date) filter.end_date.$lte = new Date(end_date);
+
+    const tour_package = await Tour_package.find(filter)
+      .limit(query_limit)
+      .skip(skip)
+      .sort({ createAt: -1 });
+
+    const total_count = await tour_package.countDocuments(filter);
+
+    const pageination = getPegination(current_page, total_count, query_limit);
     res.status(201).json({
       message: " package fetched successfully",
       status: "successfully",
       data: tour_package,
+      pageination,
     });
   } catch (error) {
     next(error);
