@@ -35,6 +35,8 @@ export const create = async (req, res, next) => {
 // *get all categories
 
 export const getAll = async (req, res, next) => {
+  // query
+  // name,destination
   try {
     const categories = await Category.find({});
     res.status(200).json({

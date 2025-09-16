@@ -3,6 +3,7 @@ import AppError from "../middlewares/error-handler.middlewares.js";
 import Tour_package from "../models/package.model.js";
 import { model } from "mongoose";
 import { package_cost_type } from "../config/constants.js";
+import { type } from "os";
 
 // *post booking
 export const book = async (req, res, next) => {
@@ -70,6 +71,27 @@ export const book = async (req, res, next) => {
 // * get all booking
 export const getAll = async (req, res, next) => {
   try {
+    const filter = {};
+
+    const { customer_name, destination, email, booking_ref } = req.body;
+    if (query) {
+      filter.$or = [
+        {
+          customer_name: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          des: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+      ];
+    }
+    if (type) filter.cost_type = type;
+
     const booking = await Booking.find({});
 
     res.status(201).json({
@@ -104,64 +126,64 @@ export const getById = async (req, res, next) => {
 };
 
 // *update booking
-// export const update = async (req, res, next) => {
-//   const { id } = req.params;
-//   const { total_person } = req.body;
+export const update = async (req, res, next) => {
+  const { id } = req.params;
+  const { total_person } = req.body;
 
-//   try {
-//     const booking = await Booking.findById(id);
-//     if (!booking) {
-//       throw new AppError("booking not found", 404);
-//     }
+  try {
+    const booking = await Booking.findById(id);
+    if (!booking) {
+      throw new AppError("booking not found", 404);
+    }
 
-//     const booked_tour_package = await Tour_package.findById(
-//       booking.tour_package
-//     );
-//     if (!booked_tour_package) {
-//       throw new AppError("package not found", 404);
-//     }
+    const booked_tour_package = await Tour_package.findById(
+      booking.tour_package
+    );
+    if (!booked_tour_package) {
+      throw new AppError("package not found", 404);
+    }
 
-//     if (total_person) {
-//       booked_tour_package.seats_available += booking.total_person;
+    if (total_person) {
+      booked_tour_package.seats_available += booking.total_person;
 
-//       if (booked_tour_package.seats_available  total_person) {
-//         throw new AppError("not enough seats available", 400);
-//       }
+      if (booked_tour_package.seats_available < total_person) {
+        throw new AppError("not enough seats available", 400);
+      }
 
-//       booking.total_person = parseInt(total_person);
+      booking.total_person = parseInt(total_person);
 
-//       booked_tour_package.seats_available -= parseInt(total_person);
+      booked_tour_package.seats_available -= parseInt(total_person);
 
-//       const total_days =
-//         (new Date(booked_tour_package.end_date).getTime() -
-//           new Date(booked_tour_package.start_date).getTime()) /
-//         (1000 * 24 * 60 * 60);
+      const total_days =
+        (new Date(booked_tour_package.end_date).getTime() -
+          new Date(booked_tour_package.start_date).getTime()) /
+        (1000 * 24 * 60 * 60);
 
-//       if (booked_tour_package.cost_type === package_cost_type.PER_PERSON) {
-//         booking.total_price = (
-//           booking.total_person * booked_tour_package.price
-//         ).toFixed(2);
-//       } else {
-//         booking.total_price = (
-//           booking.total_person *
-//           booked_tour_package.price *
-//           total_days
-//         ).toFixed(2);
-//       }
-//     }
+      if (booked_tour_package.cost_type === package_cost_type.PER_PERSON) {
+        booking.total_price = (
+          booking.total_person * booked_tour_package.price
+        ).toFixed(2);
+      } else {
+        booking.total_price = (
+          booking.total_person *
+          booked_tour_package.price *
+          total_days
+        ).toFixed(2);
+      }
+    }
 
-//     await booked_tour_package.save();
-//     await booking.save();
+    await booked_tour_package.save();
+    await booking.save();
 
-//     res.status(200).json({
-//       message: "booking updated",
-//       status: "success",
-//       data: booking,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(200).json({
+      message: "booking updated",
+      status: "success",
+      data: booking,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // *delete booking
 export const remove = async (req, res, next) => {

@@ -6,6 +6,7 @@ const users = [];
 // getall
 export const getALL = async (request, response, next) => {
   try {
+    //   first_name, last_name
     const users = await User.find({});
 
     response.status(200).json({

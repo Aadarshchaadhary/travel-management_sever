@@ -4,7 +4,7 @@ import {
   getAll,
   getById,
   remove,
-  // update,
+  update,
 } from "../controllers/booking.controller.js";
 
 const router = express.Router();
@@ -20,6 +20,6 @@ router.get("/:id", getById);
 // delete
 router.delete("/:id", remove);
 //  update
-// router.put("/:id", update);
+router.put("/:id", update);
 
 export default router;
