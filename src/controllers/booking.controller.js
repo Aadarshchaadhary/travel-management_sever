@@ -69,35 +69,64 @@ export const book = async (req, res, next) => {
 };
 
 // * get all booking
+import Booking from "../models/booking.model.js";
+
 export const getAll = async (req, res, next) => {
   try {
-    const filter = {};
+    let filter = {};
+    const {
+      query,
+      type,
+      customer_name,
+      destination,
+      email,
+      booking_ref,
+      page = 1,
+      limit = 10,
+    } = req.query; // ✅ filters should come from query params
 
-    const { customer_name, destination, email, booking_ref } = req.body;
+    const current_page = Number(page);
+    const query_limit = Number(limit);
+    const skip = (current_page - 1) * query_limit;
+
+    // 🔍 Global search (search across multiple fields)
     if (query) {
       filter.$or = [
-        {
-          customer_name: {
-            $regex: query,
-            $options: "i",
-          },
-        },
-        {
-          des: {
-            $regex: query,
-            $options: "i",
-          },
-        },
+        { customer_name: { $regex: query, $options: "i" } },
+        { destination: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+        { booking_ref: { $regex: query, $options: "i" } },
       ];
     }
+
+    // 🎯 Individual field filters
+    if (customer_name)
+      filter.customer_name = { $regex: customer_name, $options: "i" };
+    if (destination)
+      filter.destination = { $regex: destination, $options: "i" };
+    if (email) filter.email = { $regex: email, $options: "i" };
+    if (booking_ref)
+      filter.booking_ref = { $regex: booking_ref, $options: "i" };
+
+    //  Type filter
     if (type) filter.cost_type = type;
 
-    const booking = await Booking.find({});
+    //  Count for pagination
+    const total = await Booking.countDocuments(filter);
 
-    res.status(201).json({
-      message: "booking fetched",
+    //  Fetch with pagination
+    const bookings = await Booking.find(filter).skip(skip).limit(query_limit);
+
+    res.status(200).json({
+      message: "Bookings fetched successfully",
       status: "success",
-      data: booking,
+      meta: {
+        total,
+        current_page,
+        total_pages: Math.ceil(total / query_limit),
+        limit: query_limit,
+      },
+      data: bookings,
     });
   } catch (error) {
     next(error);

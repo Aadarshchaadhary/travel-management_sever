@@ -4,18 +4,41 @@ import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
 
 const users = [];
 // getall
-export const getALL = async (request, response, next) => {
-  try {
-    //   first_name, last_name
-    const users = await User.find({});
+import User from "../models/user.model.js";
 
-    response.status(200).json({
-      message: " all user  fetched",
+export const getALL = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10, first_name, last_name } = req.query;
+
+    const current_page = Number(page);
+    const query_limit = Number(limit);
+    const skip = (current_page - 1) * query_limit;
+
+    let filter = {};
+
+    // 🎯 Optional filters
+    if (first_name) filter.first_name = { $regex: first_name, $options: "i" };
+    if (last_name) filter.last_name = { $regex: last_name, $options: "i" };
+
+    // 📊 Count total users for pagination
+    const total = await User.countDocuments(filter);
+
+    // ⏳ Apply filter + pagination
+    const users = await User.find(filter).skip(skip).limit(query_limit);
+
+    res.status(200).json({
+      message: "All users fetched",
       status: "success",
+      meta: {
+        total,
+        current_page,
+        total_pages: Math.ceil(total / query_limit),
+        limit: query_limit,
+      },
       data: users,
     });
   } catch (error) {
-    next(Error);
+    next(error);
   }
 };
 

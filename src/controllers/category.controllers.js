@@ -34,20 +34,54 @@ export const create = async (req, res, next) => {
 };
 // *get all categories
 
+import Category from "../models/category.model.js";
+
 export const getAll = async (req, res, next) => {
-  // query
-  // name,destination
   try {
-    const categories = await Category.find({});
+    let filter = {};
+    const { query, type, page = 1, limit = 10 } = req.query;
+
+    const current_page = Number(page);
+    const query_limit = Number(limit);
+    const skip = (current_page - 1) * query_limit;
+
+    //  Search filter (name & destination)
+    if (query) {
+      filter.$or = [
+        { name: { $regex: query, $options: "i" } },
+        { destination: { $regex: query, $options: "i" } },
+      ];
+    }
+
+    //  Type filter
+    if (type) {
+      filter.cost_type = type;
+    }
+
+    //  Total count
+    const total = await Category.countDocuments(filter);
+
+    //  Fetch with pagination
+    const categories = await Category.find(filter)
+      .skip(skip)
+      .limit(query_limit);
+
     res.status(200).json({
       message: "All categories fetched",
       status: "success",
+      meta: {
+        total,
+        current_page,
+        total_pages: Math.ceil(total / query_limit),
+        limit: query_limit,
+      },
       data: categories,
     });
   } catch (error) {
     next(error);
   }
 };
+
 // * get category by id
 
 export const getById = async (req, res, next) => {
