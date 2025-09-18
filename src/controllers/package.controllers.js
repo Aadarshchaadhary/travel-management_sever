@@ -250,6 +250,12 @@ export const update = async (req, res, next) => {
         public_id,
       };
     }
+    const uploadedImages = [];
+    for (const img of images) {
+      const { path, public_id } = await upload_file(img.path, package_folder);
+      uploadedImages.push({ path, public_id });
+    }
+    tour_package.images = uploadedImages;
 
     await pkg.save();
 
