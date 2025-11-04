@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 
 // ! importing routes
 import categoryRoutes from "./route/category.routes.js";
@@ -65,6 +66,7 @@ const app = express();
 // * using middleware
 // app.use(middleware1);
 // app.use(middleware2);
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 

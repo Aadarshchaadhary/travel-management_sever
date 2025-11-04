@@ -34,8 +34,6 @@ export const create = async (req, res, next) => {
 };
 // *get all categories
 
-import Category from "../models/category.model.js";
-
 export const getAll = async (req, res, next) => {
   try {
     let filter = {};

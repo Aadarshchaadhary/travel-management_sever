@@ -69,7 +69,6 @@ export const book = async (req, res, next) => {
 };
 
 // * get all booking
-import Booking from "../models/booking.model.js";
 
 export const getAll = async (req, res, next) => {
   try {
