@@ -117,7 +117,7 @@ export const login = async (request, response, next) => {
 };
 
 export const me = async (req, res, next) => {
-  const id = requestAnimationFrame.user._id;
+  const id = req.user._id;
 
   const user = await User.findById(id);
   if (!user) {

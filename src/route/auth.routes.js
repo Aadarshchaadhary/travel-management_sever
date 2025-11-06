@@ -1,6 +1,7 @@
 import express from "express";
 import { register, login } from "../controllers/auth.controller.js";
 import { uploader } from "../middlewares/uploader.middlewares.js";
+import { authenticate } from "../middlewares/auth.middlewares.js";
 
 const router = express.Router();
 const upload = uploader();
