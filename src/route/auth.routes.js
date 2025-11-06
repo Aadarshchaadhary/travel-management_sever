@@ -11,4 +11,7 @@ router.post("/register", upload.single("profile_image"), register);
 // !login/ user
 router.post("/login", login);
 
+// auth check me
+router.get("/me", authenticate([Role.ADMIN, Role.USER]).me);
+
 export default router;

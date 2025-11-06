@@ -115,3 +115,17 @@ export const login = async (request, response, next) => {
     });
   }
 };
+
+export const me = async (req, res, next) => {
+  const id = requestAnimationFrame.user._id;
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw new CustomError("user not found", 404);
+  }
+  res.status(200).json({
+    message: "profile fetched",
+    data: "user",
+    status: "success",
+  });
+};
