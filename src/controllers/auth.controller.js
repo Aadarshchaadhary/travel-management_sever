@@ -125,7 +125,7 @@ export const me = async (req, res, next) => {
   }
   res.status(200).json({
     message: "profile fetched",
-    data: "user",
+    data: user,
     status: "success",
   });
 };

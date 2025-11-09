@@ -40,6 +40,14 @@ export const authenticate = (roles = []) => {
       ) {
         throw new AppError("Forbidden. Access denied", 403);
       }
+      //
+      req.user = {
+        _id: user.id,
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      };
 
       next();
     } catch (error) {
