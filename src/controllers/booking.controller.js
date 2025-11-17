@@ -158,7 +158,7 @@ export const getById = async (req, res, next) => {
 // *update booking
 export const update = async (req, res, next) => {
   const { id } = req.params;
-  const { total_person } = req.body;
+  const { total_person, full_name, phone } = req.body;
 
   try {
     const booking = await Booking.findById(id);
@@ -201,6 +201,8 @@ export const update = async (req, res, next) => {
         ).toFixed(2);
       }
     }
+    if (full_name) booking.full_name = full_name;
+    if (phone) booking.phone = phone;
 
     await booked_tour_package.save();
     await booking.save();
