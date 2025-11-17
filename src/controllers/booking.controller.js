@@ -7,7 +7,7 @@ import { type } from "os";
 
 // *post booking
 export const book = async (req, res, next) => {
-  const { tour_package, total_person } = req.body;
+  const { tour_package, total_person, phone, full_name } = req.body;
   const user = req.user._id;
   let total_price = 0;
   try {
@@ -32,6 +32,8 @@ export const book = async (req, res, next) => {
 
     const book_package = new Booking.create({
       user,
+      phone,
+      full_name,
       tour_package: tour_package._id,
       total_person: parseInt(total_person),
     });

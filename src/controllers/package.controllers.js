@@ -129,11 +129,12 @@ export const get = async (req, res, next) => {
     if (end_date) filter.end_date.$lte = new Date(end_date);
 
     const tour_package = await Tour_package.find(filter)
+      .populate("category")
       .limit(query_limit)
       .skip(skip)
       .sort({ createAt: -1 });
 
-    const total_count = await tour_package.countDocuments(filter);
+    const total_count = await Tour_package.countDocuments(filter);
 
     const pageination = getPegination(current_page, total_count, query_limit);
     res.status(201).json({
@@ -145,18 +146,13 @@ export const get = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  res.status(200).json({
-    message: "package fetched sucessfully",
-    status: "sucsess",
-  });
 };
 //  GetById
 export const getById = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const tour_package = await Tour_package.findById(id);
+    const tour_package = await Tour_package.findById(id).populate("category");
     if (!tour_package) {
       throw new AppError("package not founded", 404);
     }

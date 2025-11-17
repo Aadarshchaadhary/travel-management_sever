@@ -1,3 +1,4 @@
+import { kMaxLength } from "buffer";
 import mongoose from "mongoose";
 
 const booking_model = new mongoose.Schema(
@@ -6,6 +7,16 @@ const booking_model = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: [true, "user is required"],
+    },
+    full_name: {
+      type: String,
+      required: [true, "Full name is required"],
+      trim: true,
+    },
+    phone: {
+      type: Number,
+      required: [true, "Number is required"],
+      maxLength: 15,
     },
     tour_package: {
       type: mongoose.Schema.Types.ObjectId,

@@ -4,6 +4,7 @@
 // body
 
 import AppError from "../middlewares/error-handler.middlewares.js";
+import Booking from "../models/booking.model.js";
 import User from "../models/user.model.js";
 import { compare_password, hash_password } from "../utils/bcrypts.utils.js";
 import { upload_file } from "../utils/cloudinary.utils.js";
@@ -129,3 +130,23 @@ export const me = async (req, res, next) => {
     status: "success",
   });
 };
+
+export const allBooking = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const bookings = await Booking.find({ user: userId });
+
+    res.status(200).json({
+      success: true,
+      message: "User bookings fetched successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user bookings",
+      error: error.message,
+    });
+  }
+};
+

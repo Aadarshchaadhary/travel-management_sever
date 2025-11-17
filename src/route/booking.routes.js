@@ -8,6 +8,7 @@ import {
 } from "../controllers/booking.controller.js";
 import { authenticate } from "../middlewares/auth.middlewares.js";
 import { Role } from "../config/constants.js";
+import { allBooking } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
@@ -25,6 +26,6 @@ router.delete("/:id", authenticate([Role.USER, Role.ADMIN]), remove);
 router.put("/:id", authenticate([Role.USER, Role.ADMIN]), update);
 
 // ? Get all user bookings
-// router.get('/user',authenticate([Role.USER,]),)
+router.get("/user", authenticate([Role.USER]), allBooking);
 
 export default router;
