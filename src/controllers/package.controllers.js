@@ -1,8 +1,8 @@
 import Tour_package from "../models/package.model.js";
 import Category from "../models/category.model.js";
-import AppError from "../middlewares/error-handler.middleware.js";
+import AppError from "../middlewares/error-handler.middlewares.js";
 import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
-import { getPagination } from "../utils/pagination.utils.js";
+import { getPegination } from "../utils/pagination.utils.js";
 
 const package_folder = "/packages";
 
@@ -137,8 +137,8 @@ export const getAll = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     const total_count = await Tour_package.countDocuments(filter);
-    // get pagination
-    const pagination = getPagination(current_page, total_count, query_limit);
+
+    const pagination = getPegination(current_page, total_count, query_limit);
 
     res.status(200).json({
       message: "packages fetched successfully",
@@ -150,7 +150,7 @@ export const getAll = async (req, res, next) => {
     next(error);
   }
 };
-// `* get package by id
+
 export const getById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -167,7 +167,7 @@ export const getById = async (req, res, next) => {
     next(error);
   }
 };
-// `
+
 export const remove = async (req, res, next) => {
   const { id } = req.params;
   const tour_package = await Tour_package.findById(id);

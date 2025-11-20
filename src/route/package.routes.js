@@ -2,7 +2,7 @@ import express from "express";
 
 import {
   create,
-  get,
+  getAll,
   getById,
   remove,
   update,
@@ -32,7 +32,7 @@ router.post(
 );
 
 // get
-router.get("/", get);
+router.get("/", getAll);
 // get by id
 router.get("/:id", getById);
 // delete
