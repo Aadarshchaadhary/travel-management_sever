@@ -1,13 +1,12 @@
 import Tour_package from "../models/package.model.js";
 import Category from "../models/category.model.js";
-import AppError from "../middlewares/error-handler.middlewares.js";
+import AppError from "../middlewares/error-handler.middleware.js";
 import { delete_file, upload_file } from "../utils/cloudinary.utils.js";
-import { startSession } from "mongoose";
-import { getPegination } from "../utils/pagination.utils.js";
+import { getPagination } from "../utils/pagination.utils.js";
 
-const package_folder = "/package";
+const package_folder = "/packages";
 
-// create
+//* create new package
 export const create = async (req, res, next) => {
   try {
     const {
@@ -18,16 +17,20 @@ export const create = async (req, res, next) => {
       end_date,
       total_seats,
       price,
-      destination,
+      destinations,
       cost_type,
     } = req.body;
+
     const { cover_image, images } = req.files;
     if (!cover_image) {
       throw new AppError("Cover image is required", 400);
     }
+
     if (!images) {
-      throw new AppError("Images is required", 400);
+      throw new AppError("Imags is required", 400);
     }
+
+    console.log(req.files);
     const tour_package = new Tour_package({
       name,
       description,
@@ -36,42 +39,38 @@ export const create = async (req, res, next) => {
       total_seats,
       seats_available: parseInt(total_seats),
       price,
-      destination,
       cost_type,
-      destination: JSON.parse(destination ?? ""),
+      destinations: JSON.parse(destinations ?? ""),
     });
 
     const package_category = await Category.findById(category);
 
     if (!package_category) {
-      throw new AppError("category is not founded", 404);
+      throw new AppError("Category not found", 404);
     }
     tour_package.category = package_category._id;
 
-    // upload cover_image
+    // upload cocer image
+
     const { path, public_id } = await upload_file(
       cover_image[0].path,
-      "/package"
+      package_folder
     );
-
     tour_package.cover_image = {
       path,
       public_id,
     };
 
     // upload images
-
     if (images && Array.isArray(images)) {
-      const promise = images.map(
-        async (image) => await upload_file(image.path),
-        package_folder
+      const promises = images.map(
+        async (image) => await upload_file(image.path, package_folder)
       );
 
-      const package_images = await Promise.all(promise);
+      const package_images = await Promise.all(promises);
 
       tour_package.images = package_images;
     }
-
     await tour_package.save();
 
     res.status(201).json({
@@ -82,8 +81,9 @@ export const create = async (req, res, next) => {
     next(error);
   }
 };
-// get all
-export const get = async (req, res, next) => {
+
+//* get all package
+export const getAll = async (req, res, next) => {
   try {
     let filter = {};
     const {
@@ -96,6 +96,7 @@ export const get = async (req, res, next) => {
       page = 1,
       limit = 10,
     } = req.query;
+
     const current_page = Number(page);
     const query_limit = Number(limit);
     const skip = (current_page - 1) * query_limit;
@@ -109,105 +110,97 @@ export const get = async (req, res, next) => {
           },
         },
         {
-          des: {
+          description: {
             $regex: query,
             $options: "i",
           },
         },
       ];
     }
+
     if (type) {
       filter.cost_type = type;
     }
-    if (min_price || max_price) {
-      if (min_price) filter.price.$gte = min_price; //gte = greater than equal
 
-      if (max_price) filter.price.$lte = max_price; // lte = less than equal
+    if (min_price || max_price) {
+      if (min_price) filter.price.$gte = min_price;
+      if (max_price) filter.price.$lte = max_price;
     }
 
     if (start_date) filter.start_date.$gte = new Date(start_date);
     if (end_date) filter.end_date.$lte = new Date(end_date);
 
-    const tour_package = await Tour_package.find(filter)
+    const packages = await Tour_package.find(filter)
       .populate("category")
       .limit(query_limit)
       .skip(skip)
-      .sort({ createAt: -1 });
+      .sort({ createdAt: -1 });
 
     const total_count = await Tour_package.countDocuments(filter);
-
-    const pageination = getPegination(current_page, total_count, query_limit);
-    res.status(201).json({
-      message: " package fetched successfully",
-      status: "successfully",
-      data: tour_package,
-      pageination,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-//  GetById
-export const getById = async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    const tour_package = await Tour_package.findById(id).populate("category");
-    if (!tour_package) {
-      throw new AppError("package not founded", 404);
-    }
-    res.status(201).json({
-      message: " package fetched successfully",
-      status: "successfully",
-      data: tour_package,
-    });
-  } catch (error) {
-    next(error);
-  }
-  res.status(200).json({
-    messgae: "package fetched",
-    status: "success",
-  });
-};
-// delete
-export const remove = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    // find package
-    const tour_package = await Tour_package.findById(id);
-    if (!tour_package) {
-      throw new AppError("Package not found", 404);
-    }
-
-    // delete cover image
-    if (tour_package.cover_image) {
-      await delete_file(pkg.cover_image.public_id);
-    }
-
-    // delete  images
-    if (tour_package.images) {
-      await Promise.all(
-        tour_package.images.map(async (image) => delete_file(image.public_id))
-      );
-    }
-
-    // delete package
-    await tour_package.deleteOne();
+    // get pagination
+    const pagination = getPagination(current_page, total_count, query_limit);
 
     res.status(200).json({
-      message: "Package deleted successfully",
+      message: "packages fetched successfully",
       status: "success",
+      data: packages,
+      pagination,
     });
   } catch (error) {
     next(error);
   }
+};
+// `* get package by id
+export const getById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const tour_package = await Tour_package.findById(id).populate("category");
+    if (!tour_package) {
+      throw AppError("Package not found", 404);
+    }
+    res.status(200).json({
+      message: "package fetched",
+      status: "success",
+      data: tour_package,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// `
+export const remove = async (req, res, next) => {
+  const { id } = req.params;
+  const tour_package = await Tour_package.findById(id);
+
+  if (!tour_package) {
+    throw AppError("Package not found", 404);
+  }
+
+  //* delete cover image
+  await delete_file(tour_package.cover_image.public_id);
+
+  //* delete images
+  if (tour_package.images) {
+    await Promise.all(
+      tour_package.images.map(
+        async (image) => await delete_file(image.public_id)
+      )
+    );
+  }
+
+  //* delete package
+  await tour_package.deleteOne();
+  res.status(200).json({
+    message: "package deleted",
+    status: "success",
+    data: tour_package,
+  });
 };
 
 // update
-export const update = async (req, res, next) => {
-  const { id } = req.params;
+export const update = async (req, res) => {
   try {
+    const { id } = req.params;
     const {
       name,
       category,
@@ -216,27 +209,39 @@ export const update = async (req, res, next) => {
       end_date,
       total_seats,
       price,
-      destination,
+      destinations,
       cost_type,
     } = req.body;
 
-    const tour_package = await Tour_package.FindById(id);
+    const { cover_image, images } = req.files;
+
+    const tour_package = await Tour_package.findById(id);
+
     if (!tour_package) {
-      throw new AppError("package not founded", 404);
+      throw AppError("Package not found", 404);
     }
+
     if (name) tour_package.name = name;
     if (description) tour_package.description = description;
-    if (total_seats) tour_package.total_seats = total_seats;
-    if (start_date) tour_package.total_seats = new Date(start_date);
-    if (end_date) tour_package.end_date = new Date(end_date);
+    if (total_seats) tour_package.total_seats = parseInt(total_seats);
     if (cost_type) tour_package.cost_type = cost_type;
     if (price) tour_package.price = price;
-    if (destination) tour_package.destination = JSON.parse(destination);
+    if (end_date) tour_package.end_date = new Date(end_date);
+    if (start_date) tour_package.start_date = new Date(start_date);
+    if (destinations) tour_package.destinations = JSON.parse(destinations);
 
-    const { cover_image, images } = req.files;
-    // delete cover image
-    if (cover_image) {
-      await delete_file(pkg.cover_image.public_id);
+    if (category) {
+      const package_category = await Category.findById(category);
+
+      if (!package_category) {
+        throw new AppError("Category not found", 404);
+      }
+      tour_package.category = package_category._id;
+    }
+
+    // cover image
+    if (cover_image[0]) {
+      await delete_file(tour_package.cover_image.public_id);
       const { path, public_id } = await upload_file(
         cover_image[0].path,
         package_folder
@@ -246,14 +251,9 @@ export const update = async (req, res, next) => {
         public_id,
       };
     }
-    const uploadedImages = [];
-    for (const img of images) {
-      const { path, public_id } = await upload_file(img.path, package_folder);
-      uploadedImages.push({ path, public_id });
-    }
-    tour_package.images = uploadedImages;
 
-    await pkg.save();
+    // images
+    // if()
 
     res.status(200).json({
       message: "package updated",

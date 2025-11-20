@@ -116,7 +116,7 @@ export const login = async (request, response, next) => {
     });
   }
 };
-
+// get logged in user profile
 export const me = async (req, res, next) => {
   const id = req.user._id;
 
@@ -130,7 +130,7 @@ export const me = async (req, res, next) => {
     status: "success",
   });
 };
-
+// get all bookings of logged in user
 export const allBooking = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -149,4 +149,23 @@ export const allBooking = async (req, res) => {
     });
   }
 };
-
+// logout
+export const logout = async (req, res) => {
+  try {
+    res
+      .clearCookie("access_token", {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: Date.now(),
+        secure: true,
+      })
+      .status(200)
+      .json({
+        message: "Logged out successfully!!",
+        data: null,
+        status: "success",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
